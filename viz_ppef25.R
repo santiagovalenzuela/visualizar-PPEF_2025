@@ -23,15 +23,15 @@ ramos24 <- ramos24 %>% ungroup()
 #Comparamos el PPEF25 con el PEF24, añadiendo una columna con el cambio
 #porcentual en el ramo, y otra diciendo si bajó o subió
 
-comparativo <- ramos24 %>%
+ramos24 <- ramos24 %>%
   left_join(ramos25, by = "DESC_RAMO")
 
-comparativo <- comparativo %>%
+ramos24 <- ramos24 %>%
   #renombramos las columnas
   rename(monto24 = monto.x,
          monto25 = monto.y) %>%
   #Vemos si el monto crecio, bajo o quedó igual
-  mutate(comparison = case_when(
+  mutate(comparacion = case_when(
     monto25 > monto24 ~ "crecio",
     monto25 < monto24 ~ "bajo",
     TRUE ~ "igual"))
@@ -39,12 +39,16 @@ comparativo <- comparativo %>%
 #Creamos las gráficas
 
 # Grafica1 muestra únicamente cómo se divide el presupuesto
-grafica1 <-ggplot(ramos25, aes(area = monto,
-                            label = DESC_RAMO)) +
+grafica1 <-ggplot(ramos24, aes(area = monto25,
+                            label = DESC_RAMO,
+                            fill = comparacion)) +
   
   geom_treemap(color = "white",
-               fill= "#006341",
                start = "topleft") +
+  
+  scale_fill_manual(aesthetics = "fill",
+                    values = c("#d12f21", "#21d159", "gray")) +
+  
   
   geom_treemap_text(alpha = 0.9,
                     color = "white",
@@ -71,7 +75,7 @@ grafica1 <-ggplot(ramos25, aes(area = monto,
         text = element_text(family = "ubuntu"),
         legend.position = "none",
         plot.title = element_text(hjust = 0,
-                                  color = "#631100",
+                                  color = "#d12f21",
                                   family = "ubuntu",
                                   face = "bold",
                                   size = 36),
@@ -79,5 +83,6 @@ grafica1 <-ggplot(ramos25, aes(area = monto,
         plot.caption = element_text(hjust = 0,
                                     size = 12))
 
-
 grafica1
+
+#Grafica 2 muestra cómo subió o bajó el monto asignado a cada ramo entre 2024 y 2025
